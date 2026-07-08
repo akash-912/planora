@@ -45,7 +45,7 @@ const Header = () => {
                         <span className='hidden sm:inline'>Create Event</span>
                       </Link>
                     </Button>
-                    <div className="ring-2 ring-slate-200 rounded-full hover:ring-slate-300 transition-all">
+                    
                       <UserButton>
                         <UserButton.MenuItems>
                           <UserButton.Link 
@@ -60,8 +60,7 @@ const Header = () => {
                           />
                           <UserButton.Action label='manageAccount'/>
                         </UserButton.MenuItems>
-                      </UserButton>        
-                    </div>
+                      </UserButton> 
                   </Authenticated>
 
                   <Unauthenticated>
