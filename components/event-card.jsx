@@ -31,6 +31,8 @@ const EventCard = ({
                             alt={event.title}
                             fill
                             className='object-cover'
+                            priority
+                            sizes='80px'
                         />) : (
                             <div className='absolute inset-0 flex items-center justify-center text-3xl'
                             style={{backgroundColor: event.themeColor}}>
@@ -71,9 +73,9 @@ const EventCard = ({
             <Image
                 src={event.coverImage}
                 alt={event.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                width={500}
-                height={192}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover group-hover:scale-105 transition-transform"
                 priority
             />
             ) : (

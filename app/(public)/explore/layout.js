@@ -16,7 +16,7 @@ const ExploreLayout = ({children}) => {
             {!isMainExplore && (
                 <Button 
                     variant="ghost"
-                    onclick={()=> router.push("/explore")}
+                    onClick={()=> router.push("/explore")}
                     className={'gap-2 ml-2'}
                 >
                     <ArrowLeft className="w-4 h-4"/>

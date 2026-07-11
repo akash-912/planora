@@ -19,6 +19,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, Loader2, MapPin, Users } from "lucide-react";
 import { format } from "date-fns";
 import { createLocationSlug } from "@/lib/location-utils";
+import { CATEGORIES } from "@/lib/data";
+import { Card, CardContent } from "@/components/ui/card";
 
 const ExplorePage = () => {
 
@@ -44,8 +46,18 @@ const ExplorePage = () => {
         api.explore.getCategoryCounts
     );
 
+		const categoriesWithCounts = CATEGORIES.map((cat)=>{
+			return {
+				...cat,
+				count: categoryCounts?.[cat.id] || 0
+			}
+		})
+
     const handleEventClick = (slug) =>{
         router.push(`/events/${slug}`);
+    }
+    const handleCategoryClick = (categoryID) =>{
+        router.push(`/explore/${categoryID}`);
     }
     
     const handleViewLocalEvents = () =>{
@@ -160,6 +172,70 @@ const ExplorePage = () => {
                 </div>
             </div>
         )}
+
+        {/* Browse by category  */}
+				<div className="mb-16">
+					<h2 className="text-3xl font-bold mb-6">Browse by Category</h2>
+
+					<div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-4">
+						{categoriesWithCounts.map((category) => (
+							<Card
+								key={category.id}
+								className={'py-2 group cursor-pointer hover:shadow-lg transition-all hover:border-purple-500/50'}
+								onClick={()=> handleCategoryClick(category.id)}>
+									<CardContent className={'px-3 sm:p-6 flex items-center gap-3'}>
+										<div className="text-3xl sm:text-4xl">{category.icon}</div>
+										<div className="flex-1 min-w-0">
+											<h3 className="font-semibold mb-1 group-hover:text-purple-400 transition-colors">{category.label}</h3>
+											<p className="text-sm text-muted-foreground">{category.count} Event {category.count !== 1 ? "s" : ""}</p>
+										</div>
+									</CardContent>
+							</Card>
+						))}
+					</div>
+				</div>
+
+        {/* Popular Events Across Country  */}
+
+				{popularEvents && popularEvents.length> 0 && (
+					<div className="mb-16">
+						<div className="mb-6">
+							<h2 className="text-3xl font-bold mb-1 ">Popular Across India</h2>
+							<p className="text-muted-foreground">Trending events nationwide</p>
+						</div>
+
+						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+							{popularEvents.map((event) => (<EventCard 
+								key={event._id}
+								event={event}
+								variant="list"
+								onClick={()=> handleEventClick(event.slug)}
+							/>
+							))}
+						</div>
+					</div>
+				)}
+
+        {/* Empty State */}
+				{!loadingFeatured &&
+					!loadingLocal &&
+					!loadingPopular &&
+					(!featuredEvents || featuredEvents.length === 0) &&
+					(!localEvents || localEvents.length === 0) &&
+					(!popularEvents || popularEvents.length === 0) && (
+						<Card className="p-12 text-center">
+							<div className="max-w-md mx-auto space-y-4">
+								<div className="text-6xl mb-4">🎉</div>
+								<h2 className="text-2xl font-bold">No events yet</h2>
+								<p className="text-muted-foreground">
+									Be the first to create an event in your area!
+								</p>
+								<Button asChild className="gap-2">
+									<a href="/create-event">Create Event</a>
+								</Button>
+							</div>
+						</Card>
+					)}
     </>
   )
 }
