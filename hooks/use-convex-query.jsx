@@ -1,3 +1,4 @@
+"use client"
 import { mutation } from "@/convex/_generated/server";
 import { useMutation, useQuery } from "convex/react"
 import { useEffect, useState } from "react";
@@ -35,10 +36,9 @@ export const useConvexQuery = (query, ...args) =>{
 
 
 export const useConvexMutation = (mutation) =>{
-    const result = useMutation(mutation);
-
+    const mutationFn = useMutation(mutation);
     const [data, setData] = useState(undefined);
-    const [isLoading,setIsLoading] = useState(true);
+    const [isLoading,setIsLoading] = useState(false);
     const [error,  setError] = useState(null);
 
     const mutate = async (...args) => {
@@ -46,12 +46,13 @@ export const useConvexMutation = (mutation) =>{
         setError(null);
 
         try {
-            const response = await useMutation(...args);
+            const response = await mutationFn(...args);
             setData(response);
             return response;
         }catch(err){
             setError(err);
             toast.error(err.message);
+            throw err;
         } finally {
             setIsLoading(false);
         }

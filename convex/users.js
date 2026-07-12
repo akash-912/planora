@@ -1,5 +1,7 @@
 import { AwardIcon } from "lucide-react";
 import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
+import { internal } from "./_generated/api";
 
 export const store = mutation({
     args: {},
@@ -48,3 +50,25 @@ export const getCurrentUser = query({
     },
 })
 
+export const completeOnboarding = mutation({
+    args: {
+        location: v.object({
+            city: v.string(),
+            state: v.optional(v.string()),
+            country: v.string(),
+        }),
+        interests: v.array(v.string()),
+    },
+    handler: async (ctx,args) =>{
+        const user = await ctx.runQuery(internal.users.getCurrentUser);
+
+        await ctx.db.patch(user._id, {
+            location: args.location,
+            interests: args.interests,
+            hasCompletedOnboarding: true,
+            updatedAt: Date.now(),
+        });
+        
+        return user._id;
+    },
+});

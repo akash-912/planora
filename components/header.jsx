@@ -11,6 +11,9 @@ import { useStoreUser } from '@/hooks/use-store-user'
 import { Building, Plus } from 'lucide-react'
 import { Ticket } from "lucide-react";
 import { createFromNextReadableStream } from 'next/dist/client/components/router-reducer/fetch-server-response'
+import OnboardingModal  from './onboarding-modal.jsx'
+import { useOnboarding } from '@/hooks/use-onboarding'
+import SearchLocationBar from './search-location-bar'
 
 const Header = () => {
 
@@ -18,6 +21,7 @@ const Header = () => {
 
   const [showUpgradeModal,setShowUpgradeModal] = useState(false);
 
+  const { showOnboarding, handleOnboardingComplete, handleOnboardSkip} = useOnboarding();
   return (
     <>
         <nav className='fixed top-0 left-0 right-0 bg-background/80 backdrop-blur-xl z-20 border-b'>
@@ -28,6 +32,9 @@ const Header = () => {
               </Link>
                 {/* Search & Location - Desktop Only */}
                 
+                <div className='hidden md:flex flex-1 justify-center'>
+                  <SearchLocationBar />
+                </div>
                 {/* Right Side Actions  */}
                 <div className='flex items-center'>
                   <div className="flex items-center gap-4 p-2">
@@ -70,20 +77,28 @@ const Header = () => {
                     </SignInButton>
                   </Unauthenticated>
                 </div>
-                </div>
+              </div>
             </div>
 
             {/* Mobile Search & Location - Below Header  */}
 
+            <div className='md:hidden border-t px-3 py-3'>
+              <SearchLocationBar />
+            </div>
             {/* Loader  */}{
-            isLoading&&
-            <div className='absolute bottom-0 left-0 w-full'>
+              isLoading&&
+              <div className='absolute bottom-0 left-0 w-full'>
               <BarLoader width={'100%'} color='#a855f7'/>
             </div>
             }
         </nav>
 
         {/* Modals  */}
+        <OnboardingModal 
+          isOpen={showOnboarding}
+          onClose={handleOnboardSkip}
+          onComplete={handleOnboardingComplete}
+        />
     </>
   )
 }

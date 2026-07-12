@@ -38,9 +38,13 @@ const ExplorePage = () => {
         city: currentUser?.location?.city || "Gurgaon",
         state: currentUser?.location?.state || "Haryana",
         limit: 4,
+				userInterests: currentUser?.interests || [],
     });
 
-    const { data: popularEvents, isLoading: loadingPopular } = useConvexQuery(api.explore.getPopularEvents, {limit: 6});
+    const { data: popularEvents, isLoading: loadingPopular } = useConvexQuery(api.explore.getPopularEvents, {
+        limit: 6,
+        userInterests: currentUser?.interests || [], 
+    });
 
     const { data: categoryCounts} = useConvexQuery(
         api.explore.getCategoryCounts

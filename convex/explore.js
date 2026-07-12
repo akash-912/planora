@@ -29,6 +29,7 @@ export const getEventsByLocation = query({
         city: v.optional(v.string()),
         state: v.optional(v.string()),
         limit: v.optional(v.number()),
+        userInterests: v.optional(v.array(v.string())),
     },
     handler: async (ctx,args) => {
         const now = Date.now();
@@ -45,6 +46,13 @@ export const getEventsByLocation = query({
             );
         }
 
+        if (args.userInterests && args.userInterests.length > 0) {
+            events.sort((a, b) => {
+                const aMatches = args.userInterests.includes(a.category) ? 1 : 0;
+                const bMatches = args.userInterests.includes(b.category) ? 1 : 0;
+                return bMatches - aMatches; // Puts matches (1) before non-matches (0)
+            });
+        }
         return events.slice(0,args.limit ?? 4);
     }
 })
@@ -53,6 +61,7 @@ export const getEventsByLocation = query({
 export const getPopularEvents = query({
   args: {
     limit: v.optional(v.number()),
+    userInterests: v.optional(v.array(v.string())),
   },
   handler: async (ctx, args) => {
     const now = Date.now();
@@ -63,11 +72,19 @@ export const getPopularEvents = query({
       .collect();
 
     // Sort by registration count
-    const popular = events
-      .sort((a, b) => b.registrationCount - a.registrationCount)
-      .slice(0, args.limit ?? 6);
+    events.sort((a, b) => {
+        let scoreA = a.registrationCount;
+        let scoreB = b.registrationCount;
 
-    return popular;
+        if (args.userInterests && args.userInterests.length > 0) {
+            if (args.userInterests.includes(a.category)) scoreA += 10000;
+            if (args.userInterests.includes(b.category)) scoreB += 10000;
+        }
+
+        return scoreB - scoreA;
+    });
+
+    return events.slice(0, args.limit ?? 6);
   },
 });
 
