@@ -94,6 +94,18 @@ export const getMyEvents = query({
   },
 });
 
+export const getEventBySlug = query({
+  args: { slug: v.string() },
+  handler: async (ctx, args) => {
+    const event = await ctx.db
+      .query("events")
+      .withIndex("by_slug", (q) => q.eq("slug", args.slug))
+      .unique();
+
+    return event;
+  },
+});
+
 // Delete event
 export const deleteEvent = mutation({
   args: { eventId: v.id("events") },

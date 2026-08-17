@@ -1,20 +1,24 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { Groq } from "groq-sdk"; // Replaced Gemini import with Groq
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+if (!process.env.GROQ_API_KEY) {
+  console.error("CRITICAL: GROQ_API_KEY is missing from .env.local");
+}
+
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY,
+});
 
 export async function POST(req) {
-  try{
+  try {
     const { prompt } = await req.json();
     
-    if(!prompt){
+    if (!prompt) {
       return NextResponse.json(
         { error: "Prompt is required"},
         { status: 400}
       );
     }
-
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash"});
 
     const systemPrompt = `You are an event planning assistant. Generate event details based on the user's description.
 
@@ -40,10 +44,16 @@ Rules:
 - suggestedTicketType should be either "free" or "paid"
 `;
 
-    const result = await model.generateContent(systemPrompt);
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `User's event idea: ${prompt}` }
+      ],
+      model: "llama-3.1-8b-instant", 
+      response_format: { type: "json_object" },
+    });
 
-    const response = await result.response;
-    const text = response.text();
+    const text = completion.choices[0]?.message?.content;
 
     // Clean the response (remove markdown code blocks if present)
     let cleanedText = text.trim();
@@ -64,7 +74,7 @@ Rules:
   } catch (error) {
     console.error("Error generating event:", error);
     return NextResponse.json(
-      { error: "Failed to generate event" + error.message },
+      { error: "Failed to generate event: " + error.message },
       { status: 500 }
     );
   }

@@ -196,8 +196,15 @@ const CreateEvent = () => {
     }
   };
 
-  const handleAIGenerate = (generatedData) => {};
-  
+  const handleAIGenerate = (generatedData) => {
+    setValue("title", generatedData.title);
+    setValue("description", generatedData.description);
+    setValue("category", generatedData.category);
+    setValue("capacity", generatedData.suggestedCapacity);
+    setValue("ticketType", generatedData.suggestedTicketType);
+    toast.success("Event details filled! Customize as needed.");
+  };
+
   return (
     <div
       className="min-h-screen transition-colors duration-300 px-6 py-8 -mt-6 md:-mt-16 lg:-mt-5 lg:rounded-md"

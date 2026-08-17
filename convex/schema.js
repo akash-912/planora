@@ -1,6 +1,5 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
-import { QrCode } from "lucide-react";
 
 export default defineSchema({
     // users Table

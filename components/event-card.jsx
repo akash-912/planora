@@ -2,7 +2,7 @@ import React from 'react'
 import { Card, CardContent } from './ui/card'
 import Image from 'next/image'
 import { getCategoryIcon, getCategoryLabel } from '@/lib/data'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, Eye, MapPin, QrCode, Trash2, Users, X } from 'lucide-react'
 import { format } from 'date-fns'
 import { Badge } from './ui/badge'
 import { Button } from './ui/button'
@@ -10,9 +10,9 @@ import { Button } from './ui/button'
 const EventCard = ({
     event,
     onClick,
-    showActions = false,
     onDelete,
     variant = "grid",
+    action = null, // "event" | "ticket" | null 
     className = "",
 }) => {
     
@@ -122,8 +122,8 @@ const EventCard = ({
                 </div>
             </div>         
 
-            {showActions && (
-                <div>
+            {action && (
+                <div className='flex gap-2 pt-2'>
                     <Button
                         variant='outline'
                         size='sm'
@@ -131,7 +131,19 @@ const EventCard = ({
                         onClick={(e) =>{
                             e.stopPropagation();
                             onClick?.(e);
-                        }}>
+                        }}> 
+                            { action === "event" ? (
+                                <>
+                                    <Eye  className='w-4 h-4'/>
+                                    View
+                                </>
+                            ) : (
+                                <>
+                                    <QrCode className='w-4 h-4'/>
+                                    Show Ticket
+                                </>
+                            )
+                        }
                             View
                     </Button>
 
