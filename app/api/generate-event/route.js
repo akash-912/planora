@@ -55,7 +55,7 @@ Rules:
         { role: "system", content: systemPrompt },
         { role: "user", content: `User's event idea: ${prompt}` } // This handles the user prompt correctly
       ],
-      model: 'llama-3.1-8b-instant',
+      model: 'groq/compound',
       response_format: { type: "json_object" },
     });
 
