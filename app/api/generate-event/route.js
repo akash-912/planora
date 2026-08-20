@@ -1,25 +1,33 @@
 import { NextResponse } from "next/server";
-import { Groq } from "groq-sdk"; // Replaced Gemini import with Groq
+import { Groq } from "groq-sdk";
 
+// 1. Consistent environment variable check
 if (!process.env.GROQ_API_KEY) {
   console.error("CRITICAL: GROQ_API_KEY is missing from .env.local");
 }
 
+// 2. Initialized strictly with process.env and removed the browser flag
 const groq = new Groq({
-  apiKey: process.env.GROQ_API_KEY,
+    apiKey: process.env.GROQ_API_KEY || '',
 });
 
 export async function POST(req) {
   try {
+    // 3. Removed Vite-specific env checks
+    if (!process.env.GROQ_API_KEY) {
+      throw new Error("Groq API key is not configured in env");
+    }
+    
     const { prompt } = await req.json();
     
     if (!prompt) {
       return NextResponse.json(
-        { error: "Prompt is required"},
-        { status: 400}
+        { error: "Prompt is required" },
+        { status: 400 }
       );
     }
 
+    // 4. Removed the duplicated prompt injection at the bottom of the system instructions
     const systemPrompt = `You are an event planning assistant. Generate event details based on the user's description.
 
 CRITICAL: Return ONLY valid JSON with properly escaped strings. No newlines in string values - use spaces instead.
@@ -33,8 +41,6 @@ Return this exact JSON structure:
   "suggestedTicketType": "free"
 }
 
-User's event idea: ${prompt}
-
 Rules:
 - Return ONLY the JSON object, no markdown, no explanation
 - All string values must be on a single line with no line breaks
@@ -47,9 +53,9 @@ Rules:
     const completion = await groq.chat.completions.create({
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: `User's event idea: ${prompt}` }
+        { role: "user", content: `User's event idea: ${prompt}` } // This handles the user prompt correctly
       ],
-      model: "llama-3.1-8b-instant", 
+      model: 'llama-3.1-8b-instant',
       response_format: { type: "json_object" },
     });
 
@@ -64,8 +70,6 @@ Rules:
     } else if (cleanedText.startsWith("```")) {
       cleanedText = cleanedText.replace(/```\n?/g, "");
     }
-
-    console.log(cleanedText);
 
     const eventData = JSON.parse(cleanedText);
 
